@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\Api\UserController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -13,7 +15,21 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+Route::fallback(function () {
+    $code = 404;
+    return response()->json(['status' => false, 'msg' => 'route not found', 'code' => $code], $code);
+});
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::get('/', function(){
+    return response()->json([
+        'data' =>'laravel-chat',
+        'msg' => null,
+    ], 200);
+});
+
+Route::prefix('/user')->group(function () {
+    $class = UserController::class;
+
+    Route::get('', [UserController::class, 'index'])->middleware('auth:sanctum');
+    Route::post('/login', [UserController::class, 'loginUser']);
 });
